@@ -1,0 +1,23 @@
+{
+  "files": {
+    "main.css": "/twentyfive/static/css/main.8c8b27cf.chunk.css",
+    "main.js": "/twentyfive/static/js/main.9652d50e.chunk.js",
+    "main.js.map": "/twentyfive/static/js/main.9652d50e.chunk.js.map",
+    "runtime-main.js": "/twentyfive/static/js/runtime-main.f6ac9a0a.js",
+    "runtime-main.js.map": "/twentyfive/static/js/runtime-main.f6ac9a0a.js.map",
+    "static/js/2.73c3aa06.chunk.js": "/twentyfive/static/js/2.73c3aa06.chunk.js",
+    "static/js/2.73c3aa06.chunk.js.map": "/twentyfive/static/js/2.73c3aa06.chunk.js.map",
+    "static/js/3.61120e8b.chunk.js": "/twentyfive/static/js/3.61120e8b.chunk.js",
+    "static/js/3.61120e8b.chunk.js.map": "/twentyfive/static/js/3.61120e8b.chunk.js.map",
+    "index.html": "/twentyfive/index.html",
+    "static/css/main.8c8b27cf.chunk.css.map": "/twentyfive/static/css/main.8c8b27cf.chunk.css.map",
+    "static/js/2.73c3aa06.chunk.js.LICENSE.txt": "/twentyfive/static/js/2.73c3aa06.chunk.js.LICENSE.txt",
+    "static/media/logo.103b5fa1.svg": "/twentyfive/static/media/logo.103b5fa1.svg"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.f6ac9a0a.js",
+    "static/js/2.73c3aa06.chunk.js",
+    "static/css/main.8c8b27cf.chunk.css",
+    "static/js/main.9652d50e.chunk.js"
+  ]
+}
