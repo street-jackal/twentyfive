@@ -1,111 +1,172 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import ReactDOM from 'react-dom';
 
-import {Provider, connect} from 'react-redux';
 import './index.css';
-import reportWebVitals from './reportWebVitals';
 
-function App() {
-  
-    return (
-      <div>
-        <h1 class="input"> 25 + 5 Clock </h1>
-        <div class="buttonBackground">
-          <SetBreak />
-          <Timer />
-          <SetSession />
-        </div>
-      </div>
-    )
-}
 
-function SetBreak() {
-  const [length, setLength] = useState(5);
+// reusable component for setting break length and session length via buttons
+function SetTime(props) {
+
   return (
     <div>
-      <p class="title" id="break-label">Break Length</p>
-      <div class="setBackground">
-        <button id="break-increment" onClick={() => setLength(length + 1)}>+</button>
-        <p id="break-length">{length} minutes</p>
-        <button id="break-decrement" onClick={() => setLength(length - 1)}>-</button>
+      <p className="title" id={props.name}>{props.title}</p>
+      <div className="setBackground">
+        <button id={props.b1} onClick={props.onClickPlus}>+</button>
+        <p id={props.valueName}>{props.length}</p>
+        <button id={props.b2} onClick={props.onClickMinus}>-</button>
       </div>
     </div>
   )
 }
 
-function SetSession() {
-  const [length, setLength] = useState(25);
-  return (
-    <div>
-      <p class="title" id="session-label">Session Length</p>
-      <div class="setBackground">
-        <button id="session-increment" onClick={() => setLength(length + 1)}>+</button>
-        <p id="session-length">{length} minutes</p>
-        <button id="session-decrement" onClick={() => setLength(length - 1)}>-</button>
-      </div>
-    </div>
-  )
-}
-
-// convert raw seconds into MM:SS format
-function formatTime(secs){
-  let minutes = Math.floor(secs/60);
+// reusable function to convert raw seconds into MM:SS format
+function formatTime(secs) {
+  if (secs < 0)
+    secs = 0;
+  let minutes = Math.floor(secs / 60);
   let seconds = secs - minutes * 60;
   seconds = seconds < 10 ? '0' + seconds : seconds;
   minutes = minutes < 10 ? '0' + minutes : minutes;
   return minutes + ':' + seconds;
 }
 
-function Timer() {
-  
-  //const [timeLeft, setTimeLeft] = useState(minutes);
-  let seconds = 25*60;
-  let timeLeft = setInterval(function(){
-    if(seconds <=0){
-      clearInterval(timeLeft);
-      document.getElementById("time-left").innerHTML = "Finished";
-    }
-    else{
-      document.getElementById("time-left").innerHTML = formatTime(seconds);
-    }
-    document.getElementById("time-left").value =  formatTime(25*60 - seconds);
-    seconds -= 1;
-  }, 1000);
+function Timer(props) {
 
-  
-  /*
+  const defBreak = 5, defSession = 25;
+  const [timeLeft, setTimeLeft] = useState(defSession * 60);
+  const [tick, setTick] = useState(false);
+  const [timerLabel, setTimerLabel] = useState("Session Timer");
+  const [flag, setFlag] = useState(true);
+  let workOrBreak = useRef(true);
+  let isRunning = useRef(false);
+  let breakLength = useRef(defBreak);
+  let sessionLength = useRef(defSession);
+  let myTimer;
+
   useEffect(() => {
-    
-  });
-*/
- 
+    if (isRunning.current) {
+
+      if (timeLeft > -1) {
+        myTimer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+      }
+
+      if (timeLeft === 0 && flag) {
+        document.getElementById("beep").play();
+        workOrBreak.current = !workOrBreak.current;
+        setTimerLabel(workOrBreak.current ? "Session Timer" : "Break Timer");
+        clearTimeout(myTimer);
+        setFlag(false);
+      }
+
+      if (timeLeft < 0 && !flag) {
+        setTimeLeft(workOrBreak.current ? sessionLength.current * 60 : breakLength.current * 60);
+        setFlag(true);
+      }
+    }
+  }, [timeLeft, isRunning.current, workOrBreak.current]);
+
+  function handleStartStop() {
+    if (isRunning.current) {
+      isRunning.current = false;
+      clearTimeout(myTimer);
+      setTick(!tick);
+    }
+    else {
+      isRunning.current = true;
+      setTick(!tick);
+    }
+  }
+
+  function handleReset() {
+    if (isRunning.current) {
+      isRunning.current = false;
+      clearTimeout(myTimer);
+    }
+    setSession(defSession);
+    setTimeLeft(defSession * 60);
+    setBreak(defBreak);
+    workOrBreak.current = true;
+    setTimerLabel("Session Timer");
+    setFlag(true);
+    document.getElementById("beep").pause();
+    document.getElementById("beep").currentTime = 0;
+    setTick(!tick);
+  }
+
+  // set break length between 1-60
+  function setBreak(value) {
+    if (!isRunning.current) {
+      breakLength.current =
+        value > 1
+          ? value > 60
+            ? 60
+            : value
+          : 1
+      setTick(!tick);
+    }
+  }
+
+  // set session length between 1-60
+  function setSession(value) {
+    if (!isRunning.current) {
+      sessionLength.current =
+        value > 1
+          ? value > 60
+            ? 60
+            : value
+          : 1
+      setTimeLeft(sessionLength.current * 60);
+      setTick(!tick);
+    }
+  }
 
   return (
     <div>
-      <p class="title" id="session-label">Session Timer</p>
-      <div class="timerBackground">
-        <p id="time-left" class="timerDisplay">25:00</p>
-        <button id="start_stop" class="sessionButton">
-          <i class="fa fa-play-circle"></i>
-        </button>
-        <button class="sessionButton">
-          <i class="fa fa-redo-alt"></i>
-        </button>
+      <h1 className="input"> 25 + 5 Clock </h1>
+      <div className="buttonBackground">
+        <SetTime
+          name="break-label"
+          length={breakLength.current}
+          title="Break Length"
+          valueName="break-length"
+          b1="break-increment"
+          b2="break-decrement"
+          onClickPlus={() => setBreak(breakLength.current + 1)}
+          onClickMinus={() => setBreak(breakLength.current - 1)}
+        />
+        <div>
+          <p className="title" id="timer-label">{timerLabel}</p>
+          <audio id="beep" src="https://bigsoundbank.com/UPLOAD/mp3/1628.mp3"> </audio>
+          <div className="timerBackground">
+            <p id="time-left" className="timerDisplay">{formatTime(timeLeft)}</p>
+            <button id="start_stop" className="sessionButton" onClick={() => handleStartStop()}>
+              <i className="fa fa-play-circle"></i>
+            </button>
+            <button id="reset" className="sessionButton" onClick={() => handleReset()}>
+              <i className="fa fa-redo-alt"></i>
+            </button>
+          </div>
+        </div>
+        <SetTime
+          name="session-label"
+          length={sessionLength.current}
+          title="Session Length"
+          valueName="session-length"
+          b1="session-increment"
+          b2="session-decrement"
+          onClickPlus={() => setSession(sessionLength.current + 1)}
+          onClickMinus={() => setSession(sessionLength.current - 1)}
+        />
       </div>
     </div>
   )
 }
 
 
-
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <Timer />
   </React.StrictMode>,
   document.getElementById('root')
 );
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
