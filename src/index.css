@@ -6,10 +6,11 @@
   --tan: #f9f5d7;
   --orange: #d65d0e;
   --blue: #83a598;
+  --brown: #7c6f64;
 }
 
 html{
-  background-color: var(--black);
+  background-color: var(--brown);
 }
 
 body{
@@ -62,7 +63,7 @@ button:focus {
 
 
 .buttonBackground {
-  background-color: var(--black);
+  background-color: var(--brown);
   display: flex;
   margin: 0 auto;
   height: 80%;
